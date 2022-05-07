@@ -43,7 +43,7 @@ weapon_size = weapon.get_rect().size
 weapon_width = weapon_size[0]
 
 weapons = []  # 무기는 여러 개 사용 가능
-weapon_speed = 10
+weapon_speed = 6
 
 ball_images = [
     pygame.image.load(os.path.join(image_path, f"balloon{i}.png")) for i in range(1, 5)
@@ -58,7 +58,7 @@ balls = [
         "y_pos": 50,  # 공의 y 좌표
         "image_index": 0,  # balloon 번호
         "to_x": 3,  # 공의 x축 이동
-        "to_y": -6,  # 공의 y축 이동
+        "to_y": -7,  # 공의 y축 이동
         "init_speed_y": ball_speed_y[0],  # y축 이동 최초 속도
     }
 ]
@@ -78,7 +78,7 @@ game_result = "Game Over"
 is_playing = True
 
 while is_playing:
-    delta = clock.tick(30)
+    delta = clock.tick(60)
 
     # 2. 이벤트 처리 (키보드 ,마우스 등)
     for event in pygame.event.get():
@@ -91,11 +91,12 @@ while is_playing:
             elif event.key == pygame.K_RIGHT:
                 character_to_x += character_speed
             elif event.key == pygame.K_SPACE:
-                weapon_x_pos = (
-                    character_x_pos + (character_width / 2) - (weapon_width / 2)
-                )  # 캐릭터의 중앙
-                weapon_y_pos = character_y_pos  # 캐릭터의 가장 위
-                weapons.append((weapon_x_pos, weapon_y_pos))
+                if len(weapons) < 3:  # 무기 개수 3개로 제한
+                    weapon_x_pos = (
+                        character_x_pos + (character_width / 2) - (weapon_width / 2)
+                    )  # 캐릭터의 중앙
+                    weapon_y_pos = character_y_pos  # 캐릭터의 가장 위
+                    weapons.append((weapon_x_pos, weapon_y_pos))
 
         if event.type == pygame.KEYUP:  # 키보드를 떼면
             if event.key in {pygame.K_LEFT, pygame.K_RIGHT}:
@@ -131,7 +132,7 @@ while is_playing:
         if ball_y_pos >= screen_height - stage_height - ball_height:
             ball["to_y"] = ball["init_speed_y"]
         else:
-            ball["to_y"] += 0.5  # 위로 진행할 때는 속도를 줄이고, 아래로 진행할 때는 속도를 늘림 (포물선 효과)
+            ball["to_y"] += 0.4  # 위로 진행할 때는 속도를 줄이고, 아래로 진행할 때는 속도를 늘림 (포물선 효과)
 
         ball["x_pos"] += ball["to_x"]
         ball["y_pos"] += ball["to_y"]
@@ -190,7 +191,7 @@ while is_playing:
                             - (small_ball_height / 2),
                             "image_index": ball_image_index + 1,
                             "to_x": -3,
-                            "to_y": -6,
+                            "to_y": -7,
                             "init_speed_y": ball_speed_y[ball_image_index + 1],
                         }
                     )
@@ -206,11 +207,15 @@ while is_playing:
                             - (small_ball_height / 2),
                             "image_index": ball_image_index + 1,
                             "to_x": 3,
-                            "to_y": -6,
+                            "to_y": -7,
                             "init_speed_y": ball_speed_y[ball_image_index + 1],
                         }
                     )
+
                 break
+        else:
+            continue
+        break
 
     # 충돌된 무기와 공 제거
     if weapon_to_remove > -1:
@@ -242,9 +247,7 @@ while is_playing:
 
     # 경과 시간 계산
     elapsed_time = (pygame.time.get_ticks() - start_ticks) / 1000
-    timer = game_font.render(
-        f"Time: {int(total_time - elapsed_time)}", True, (255, 255, 255)
-    )
+    timer = game_font.render(f"Time: {int(total_time - elapsed_time)}", True, (0, 0, 0))
     screen.blit(timer, (10, 10))
 
     # 시간 초과 (실패)
@@ -255,7 +258,7 @@ while is_playing:
     pygame.display.update()
 
 # 게임 종료 메시지 띄우기
-message = game_font.render(game_result, True, (255, 255, 0))
+message = game_font.render(game_result, True, (255, 0, 0))
 message_rect = message.get_rect(center=(int(screen_width / 2), int(screen_height / 2)))
 screen.blit(message, (message_rect))
 pygame.display.update()
