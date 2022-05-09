@@ -78,7 +78,7 @@ game_result = "Game Over"
 is_playing = True
 
 while is_playing:
-    delta = clock.tick(60)
+    delta = clock.tick(50)
 
     # 2. 이벤트 처리 (키보드 ,마우스 등)
     for event in pygame.event.get():
